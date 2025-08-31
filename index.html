@@ -2,22 +2,37 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Gra Impostor — 3 osoby</title>
+  <title>Gra Impostor — 3–10 graczy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { margin:0; padding:0; background:#0f1115; color:#fff; font-family:sans-serif; text-align:center; }
-    h1 { margin:20px; font-size:24px; }
-    #status { margin:10px; color:#ccc; }
-    #wordBox { display:none; margin:20px auto; padding:30px; font-size:32px; border:2px solid #555; border-radius:12px; width:80%; max-width:420px; }
-    button { margin:10px; padding:15px; font-size:18px; border-radius:10px; border:none; width:80%; max-width:420px; }
+    h1 { margin:18px; font-size:24px; }
+    #status { margin:8px; color:#ccc; }
+    #controls { margin:8px 16px 0; }
+    .sliderRow { display:flex; align-items:center; justify-content:center; gap:10px; }
+    input[type=range]{ width:65%; max-width:420px; }
+    .bubble{ min-width:46px; padding:8px 10px; background:#1a1f2b; border:1px solid #2d3650; border-radius:10px; font-weight:bold; }
+    #wordBox { display:none; margin:16px auto; padding:26px; font-size:32px; border:2px solid #555; border-radius:12px; width:80%; max-width:440px; }
+    button { margin:10px; padding:15px; font-size:18px; border-radius:10px; border:none; width:80%; max-width:440px; }
     .info { background:#3b82f6; color:white; }
     .danger { background:#ff3b30; color:white; }
     .ok { background:#2ac769; color:white; }
+    .muted { color:#9aa3b2; font-size:13px; margin:0 16px 8px; }
   </style>
 </head>
 <body>
-  <h1>🎭 Gra Impostor — 3 osoby 🎭</h1>
-  <div id="status">Kliknij „Nowa runda”, aby zacząć</div>
+  <h1>🎭 Gra Impostor 🎭</h1>
+
+  <div id="controls">
+    <div class="sliderRow">
+      <span class="muted">Gracze:</span>
+      <input id="playersRange" type="range" min="3" max="10" step="1" value="4" oninput="updateCount(this.value)">
+      <span id="playersBubble" class="bubble">4</span>
+    </div>
+    <p class="muted">Ustaw liczbę graczy (1 impostor, reszta ma to samo słowo).</p>
+  </div>
+
+  <div id="status">Ustaw suwak i kliknij „Nowa runda”.</div>
   <div id="wordBox"></div>
 
   <!-- proste onclick dla pełnej zgodności z Safari -->
@@ -60,21 +75,27 @@
       "Biblioteka","Muzeum","Galeria","Teatr","Hotel","Restauracja","Kawiarnia","Bar"
     ];
 
-    var TOTAL = 3;     // liczba graczy
-    var players = [];  // ["IMPOSTOR" lub słowo] x3
+    var TOTAL = 4;      // aktualna liczba graczy (startowo 4)
+    var players = [];   // talia haseł dla rundy
     var turn = 0;
 
     function $(id){ return document.getElementById(id); }
+    function updateCount(v){ TOTAL = parseInt(v,10); $("playersBubble").innerHTML = TOTAL; }
 
     function startGame(){
       players = [];
       turn = 0;
+
+      // losujemy słowo dla większości
       var word = WORDS[Math.floor(Math.random()*WORDS.length)];
-      var impostor = Math.floor(Math.random()*TOTAL); // 0..2
+      // losujemy indeks impostora w zakresie 0..TOTAL-1
+      var impostor = Math.floor(Math.random()*TOTAL);
+
       for (var i=0;i<TOTAL;i++){
         players.push(i===impostor ? "IMPOSTOR" : word);
       }
-      $("status").innerHTML = "Gracz 1/3 — kliknij „Pokaż moje hasło”.";
+
+      $("status").innerHTML = "Gracz 1/"+TOTAL+" — kliknij „Pokaż moje hasło”.";
       $("btnStart").style.display = "none";
       $("btnShow").style.display  = "inline-block";
       $("btnHide").style.display  = "none";
@@ -98,11 +119,14 @@
         $("btnShow").style.display  = "none";
         $("btnHide").style.display  = "none";
       } else {
-        $("status").innerHTML = "Gracz "+(turn+1)+"/3 — kliknij „Pokaż moje hasło”.";
+        $("status").innerHTML = "Gracz "+(turn+1)+"/"+TOTAL+" — kliknij „Pokaż moje hasło”.";
         $("btnShow").style.display  = "inline-block";
         $("btnHide").style.display  = "none";
       }
     }
+
+    // inicjalnie zsynchronizuj bąbelek z suwakiem
+    updateCount($("playersRange").value);
   </script>
 </body>
 </html>
