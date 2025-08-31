@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Gra Impostor — 3–10 graczy</title>
+  <title>Gra Impostor — 3–10 graczy, 1000 słów</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { margin:0; padding:0; background:#0f1115; color:#fff; font-family:sans-serif; text-align:center; }
@@ -32,101 +32,4 @@
     <p class="muted">Ustaw liczbę graczy (1 impostor, reszta ma to samo słowo).</p>
   </div>
 
-  <div id="status">Ustaw suwak i kliknij „Nowa runda”.</div>
-  <div id="wordBox"></div>
-
-  <!-- proste onclick dla pełnej zgodności z Safari -->
-  <button id="btnStart" class="info"  onclick="startGame()">Nowa runda</button>
-  <button id="btnShow"  class="ok"     style="display:none" onclick="showWord()">Pokaż moje hasło</button>
-  <button id="btnHide"  class="danger" style="display:none" onclick="hideWord()">Ukryj</button>
-
-  <script>
-    // 200 słów (duża pula)
-    var WORDS = [
-      "Pizza","Hamburger","Pies","Kot","Morze","Jezioro","Plaża","Góry",
-      "Telefon","Komputer","Truskawka","Wiśnia","Autobus","Pociąg","Samochód","Motocykl",
-      "Samolot","Statek","Mikrofon","Słuchawki","Lato","Zima","Prezent","Tort",
-      "Lew","Tygrys","Ryba","Ośmiornica","Lody","Czekolada","Obraz","Zdjęcie",
-      "Gra komputerowa","Gra planszowa","Cola","Sok","Szkoła","Przedszkole","Okno","Drzwi",
-      "Łóżko","Kanapa","Słońce","Księżyc","Zegar","Kalendarz","Krzesło","Stół",
-      "Koszula","Spodnie","Buty","Czapka","Ogień","Woda","Deszcz","Śnieg",
-      "Miasto","Wieś","Rower","Hulajnoga","Las","Park","Chleb","Bułka",
-      "Mleko","Jogurt","Ser","Masło","Pudełko","Torba","Nożyczki","Długopis",
-      "Książka","Gazeta","Telewizor","Radio","Kawa","Herbata","Pączek","Drożdżówka",
-      "Internet","Telewizja","Szpital","Apteka","Kucharz","Kelner","Policjant","Strażak",
-      "Młotek","Śrubokręt","Farba","Pędzel","Gitara","Pianino","Skrzypce","Perkusja",
-      "Ziemia","Mars","Jabłko","Gruszka","Rakieta","Satelita","Most","Tunel",
-      "Szafa","Biurko","Lampa","Dywan","Samuraj","Rycerz","Smok","Elf",
-      "Świeca","Latarka","Traktor","Kombajn","Koparka","Buldożer","Robot","Dron",
-      "Telegram","List","Email","SMS","Król","Królowa","Książę","Księżniczka",
-      "Mapa","Kompas","GPS","Radar","Fotograf","Malarz","Pisarz","Poeta",
-      "Pralka","Lodówka","Zmywarka","Piekarnik","Doktor","Dentysta","Nauczyciel","Uczeń",
-      "Mostek","Port","Lotnisko","Dworzec","Klucz","Zamek","Moneta","Banknot",
-      "Futbol","Koszykówka","Siatkówka","Tenis","Basen","Rzeka","Źródło","Wodospad",
-      "Motyl","Pszczoła","Mrówka","Komar","Kaktus","Róża","Drzewo","Klon",
-      "Tęcza","Gwiazda","Planeta","Galaktyka","Film","Serial","Teatr","Opera",
-      "Komiks","Manga","Anime","Bajka","Statek kosmiczny","Łódź podwodna","Żaglówka","Kajak",
-      "Maska","Kapelusz","Płaszcz","Kurtka","Słoń","Żyrafa","Hipopotam","Krokodyl",
-      "Arbuz","Melon","Cytryna","Pomarańcza","Granat","Mango","Ananas","Kokos",
-      "Mięso","Kurczak","Wołowina","Wieprzowina","Szpinak","Marchew","Ogórek","Pomidor",
-      "Sekunda","Minuta","Godzina","Dzień","Tydzień","Miesiąc","Rok","Wiek",
-      "Kolor","Kształt","Dźwięk","Zapach","Chmura","Mgła","Burza","Huragan",
-      "Papuga","Kanarek","Kruk","Sowa","Pociąg towarowy","Metro","Tramwaj","Taxi",
-      "Biblioteka","Muzeum","Galeria","Teatr","Hotel","Restauracja","Kawiarnia","Bar"
-    ];
-
-    var TOTAL = 4;      // aktualna liczba graczy (startowo 4)
-    var players = [];   // talia haseł dla rundy
-    var turn = 0;
-
-    function $(id){ return document.getElementById(id); }
-    function updateCount(v){ TOTAL = parseInt(v,10); $("playersBubble").innerHTML = TOTAL; }
-
-    function startGame(){
-      players = [];
-      turn = 0;
-
-      // losujemy słowo dla większości
-      var word = WORDS[Math.floor(Math.random()*WORDS.length)];
-      // losujemy indeks impostora w zakresie 0..TOTAL-1
-      var impostor = Math.floor(Math.random()*TOTAL);
-
-      for (var i=0;i<TOTAL;i++){
-        players.push(i===impostor ? "IMPOSTOR" : word);
-      }
-
-      $("status").innerHTML = "Gracz 1/"+TOTAL+" — kliknij „Pokaż moje hasło”.";
-      $("btnStart").style.display = "none";
-      $("btnShow").style.display  = "inline-block";
-      $("btnHide").style.display  = "none";
-      $("wordBox").style.display  = "none";
-    }
-
-    function showWord(){
-      if (turn>=TOTAL) return;
-      $("wordBox").innerHTML = players[turn];
-      $("wordBox").style.display = "block";
-      $("btnShow").style.display  = "none";
-      $("btnHide").style.display  = "inline-block";
-    }
-
-    function hideWord(){
-      $("wordBox").style.display = "none";
-      turn++;
-      if (turn>=TOTAL){
-        $("status").innerHTML = "Runda zakończona — kliknij „Nowa runda”.";
-        $("btnStart").style.display = "inline-block";
-        $("btnShow").style.display  = "none";
-        $("btnHide").style.display  = "none";
-      } else {
-        $("status").innerHTML = "Gracz "+(turn+1)+"/"+TOTAL+" — kliknij „Pokaż moje hasło”.";
-        $("btnShow").style.display  = "inline-block";
-        $("btnHide").style.display  = "none";
-      }
-    }
-
-    // inicjalnie zsynchronizuj bąbelek z suwakiem
-    updateCount($("playersRange").value);
-  </script>
-</body>
-</html>
+  <div id="status">Ustaw suwak i kliknij „Nowa runda”.</div
