@@ -22,73 +22,54 @@
   <button id="btnStart" class="info">Nowa runda</button>
   <button id="btnShow" class="ok" style="display:none">Pokaż moje hasło</button>
   <button id="btnHide" class="danger" style="display:none">Ukryj</button>
+
   <script>
-    var WORDS = [
-      "Pizza","Hamburger","Pies","Kot","Morze","Jezioro","Plaża","Góry",
-      "Telefon","Komputer","Truskawka","Wiśnia","Autobus","Pociąg","Samochód","Motocykl",
-      "Samolot","Statek","Mikrofon","Słuchawki","Lato","Zima","Prezent","Tort",
-      "Lew","Tygrys","Ryba","Ośmiornica","Lody","Czekolada","Obraz","Zdjęcie",
-      "Gra komputerowa","Gra planszowa","Cola","Sok","Szkoła","Przedszkole","Okno","Drzwi",
-      "Łóżko","Kanapa","Słońce","Księżyc","Zegar","Kalendarz","Krzesło","Stół",
-      "Koszula","Spodnie","Buty","Czapka","Ogień","Woda","Deszcz","Śnieg",
-      "Miasto","Wieś","Rower","Hulajnoga","Las","Park","Chleb","Bułka",
-      "Mleko","Jogurt","Ser","Masło","Pudełko","Torba","Nożyczki","Długopis",
-      "Książka","Gazeta","Telewizor","Radio","Kawa","Herbata","Pączek","Drożdżówka",
-      "Internet","Telewizja","Szpital","Apteka","Kucharz","Kelner","Policjant","Strażak",
-      "Młotek","Śrubokręt","Farba","Pędzel","Gitara","Pianino","Skrzypce","Perkusja",
-      "Ziemia","Mars","Jabłko","Gruszka","Rakieta","Satelita","Most","Tunel",
-      "Szafa","Biurko","Lampa","Dywan","Samuraj","Rycerz","Smok","Elf",
-      "Świeca","Latarka","Traktor","Kombajn","Koparka","Buldożer","Robot","Dron",
-      "Telegram","List","Email","SMS","Król","Królowa","Książę","Księżniczka",
-      "Mapa","Kompas","GPS","Radar","Fotograf","Malarz","Pisarz","Poeta",
-      "Pralka","Lodówka","Zmywarka","Piekarnik","Doktor","Dentysta","Nauczyciel","Uczeń",
-      "Mostek","Port","Lotnisko","Dworzec","Klucz","Zamek","Moneta","Banknot",
-      "Futbol","Koszykówka","Siatkówka","Tenis","Basen","Rzeka","Źródło","Wodospad",
-      "Motyl","Pszczoła","Mrówka","Komar","Kaktus","Róża","Drzewo","Klon",
-      "Tęcza","Gwiazda","Planeta","Galaktyka","Film","Serial","Teatr","Opera",
-      "Komiks","Manga","Anime","Bajka","Statek kosmiczny","Łódź podwodna","Żaglówka","Kajak",
-      "Maska","Kapelusz","Płaszcz","Kurtka","Słoń","Żyrafa","Hipopotam","Krokodyl",
-      "Arbuz","Melon","Cytryna","Pomarańcza","Granat","Mango","Ananas","Kokos",
-      "Mięso","Kurczak","Wołowina","Wieprzowina","Szpinak","Marchew","Ogórek","Pomidor",
-      "Sekunda","Minuta","Godzina","Dzień","Tydzień","Miesiąc","Rok","Wiek",
-      "Kolor","Kształt","Dźwięk","Zapach","Chmura","Mgła","Burza","Huragan",
-      "Papuga","Kanarek","Kruk","Sowa","Pociąg towarowy","Metro","Tramwaj","Taxi",
-      "Biblioteka","Muzeum","Galeria","Teatr","Hotel","Restauracja","Kawiarnia","Bar"
-    ];
-    var players = [], turn = 0;
+    var WORDS = ["Pizza","Hamburger","Kot","Pies","Samolot","Statek","Księżyc","Słońce","Drzewo","Kwiat","Chleb","Mleko","Gitara","Perkusja","Telefon","Komputer","Las","Morze","Rzeka","Góry"];
+    var players = [];
+    var turn = 0;
+
     function startGame(){
       players=[]; turn=0;
-      var idx = Math.floor(Math.random()*(WORDS.length/2))*2;
+      var idx = Math.floor(Math.random() * WORDS.length);
       var word = WORDS[idx];
-      var impostor = Math.floor(Math.random()*4);
-      for(var i=0;i<4;i++) players.push(i==impostor?"IMPOSTOR":word);
-      document.getElementById("status").innerHTML="Gracz 1/4 - gotowy";
-      document.getElementById("btnStart").style.display="none";
-      document.getElementById("btnShow").style.display="inline-block";
-      document.getElementById("btnHide").style.display="none";
-      document.getElementById("wordBox").style.display="none";
+      var impostor = Math.floor(Math.random() * 4);
+      for (var i=0; i<4; i++){
+        if (i === impostor) players.push("IMPOSTOR");
+        else players.push(word);
+      }
+      document.getElementById("status").innerHTML = "Gracz 1/4 - kliknij Pokaż moje hasło";
+      document.getElementById("btnStart").style.display = "none";
+      document.getElementById("btnShow").style.display = "inline-block";
+      document.getElementById("btnHide").style.display = "none";
+      document.getElementById("wordBox").style.display = "none";
     }
+
     function showWord(){
-      if(turn>=4)return;
-      document.getElementById("wordBox").innerHTML=players[turn];
-      document.getElementById("wordBox").style.display="block";
-      document.getElementById("btnShow").style.display="none";
-      document.getElementById("btnHide").style.display="inline-block";
+      if(turn >= 4) return;
+      document.getElementById("wordBox").innerHTML = players[turn];
+      document.getElementById("wordBox").style.display = "block";
+      document.getElementById("btnShow").style.display = "none";
+      document.getElementById("btnHide").style.display = "inline-block";
     }
+
     function hideWord(){
-      document.getElementById("wordBox").style.display="none";
+      document.getElementById("wordBox").style.display = "none";
       turn++;
-      if(turn>=4){
-        document.getElementById("status").innerHTML="Runda zakończona. Kliknij Nowa runda.";
-        document.getElementById("btnStart").style.display="inline-block";
-        document.getElementById("btnShow").style.display="none";
-        document.getElementById("btnHide").style.display="none";
+      if (turn >= 4){
+        document.getElementById("status").innerHTML = "Runda zakończona! Kliknij Nowa runda.";
+        document.getElementById("btnStart").style.display = "inline-block";
+        document.getElementById("btnShow").style.display = "none";
+        document.getElementById("btnHide").style.display = "none";
       } else {
-        document.getElementById("status").innerHTML="Gracz "+(turn+1)+"/4 - gotowy";
-        document.getElementById("btnShow").style.display="inline-block";
-        document.getElementById("btnHide").style.display="none";
+        document.getElementById("status").innerHTML = "Gracz " + (turn+1) + "/4 - kliknij Pokaż moje hasło";
+        document.getElementById("btnShow").style.display = "inline-block";
+        document.getElementById("btnHide").style.display = "none";
       }
     }
+
+    document.getElementById("btnStart").onclick = startGame;
+    document.getElementById("btnShow").onclick = showWord;
+    document.getElementById("btnHide").onclick = hideWord;
   </script>
 </body>
 </html>
