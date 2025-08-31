@@ -8,8 +8,8 @@
     body { margin:0; padding:0; background:#0f1115; color:#fff; font-family:sans-serif; text-align:center; }
     h1 { margin:20px; font-size:24px; }
     #status { margin:10px; color:#ccc; }
-    #wordBox { display:none; margin:20px auto; padding:30px; font-size:32px; border:2px solid #555; border-radius:12px; width:80%; max-width:400px; }
-    button { margin:10px; padding:15px; font-size:18px; border-radius:10px; border:none; width:80%; max-width:400px; }
+    #wordBox { display:none; margin:20px auto; padding:30px; font-size:32px; border:2px solid #555; border-radius:12px; width:80%; max-width:420px; }
+    button { margin:10px; padding:15px; font-size:18px; border-radius:10px; border:none; width:80%; max-width:420px; }
     .info { background:#3b82f6; color:white; }
     .danger { background:#ff3b30; color:white; }
     .ok { background:#2ac769; color:white; }
@@ -19,57 +19,89 @@
   <h1>🎭 Gra Impostor 🎭</h1>
   <div id="status">Kliknij „Nowa runda”, aby zacząć</div>
   <div id="wordBox"></div>
-  <button id="btnStart" class="info">Nowa runda</button>
-  <button id="btnShow" class="ok" style="display:none">Pokaż moje hasło</button>
-  <button id="btnHide" class="danger" style="display:none">Ukryj</button>
+
+  <!-- Uwaga: proste onclick — żadnych addEventListener -->
+  <button id="btnStart" class="info"  onclick="startGame()">Nowa runda</button>
+  <button id="btnShow"  class="ok"     style="display:none" onclick="showWord()">Pokaż moje hasło</button>
+  <button id="btnHide"  class="danger" style="display:none" onclick="hideWord()">Ukryj</button>
 
   <script>
-    var WORDS = ["Pizza","Hamburger","Kot","Pies","Samolot","Statek","Księżyc","Słońce","Drzewo","Kwiat","Chleb","Mleko","Gitara","Perkusja","Telefon","Komputer","Las","Morze","Rzeka","Góry"];
-    var players = [];
+    // 200 słów (100 par — losujemy po prostu jedno słowo dla większości)
+    var WORDS = [
+      "Pizza","Hamburger","Pies","Kot","Morze","Jezioro","Plaża","Góry",
+      "Telefon","Komputer","Truskawka","Wiśnia","Autobus","Pociąg","Samochód","Motocykl",
+      "Samolot","Statek","Mikrofon","Słuchawki","Lato","Zima","Prezent","Tort",
+      "Lew","Tygrys","Ryba","Ośmiornica","Lody","Czekolada","Obraz","Zdjęcie",
+      "Gra komputerowa","Gra planszowa","Cola","Sok","Szkoła","Przedszkole","Okno","Drzwi",
+      "Łóżko","Kanapa","Słońce","Księżyc","Zegar","Kalendarz","Krzesło","Stół",
+      "Koszula","Spodnie","Buty","Czapka","Ogień","Woda","Deszcz","Śnieg",
+      "Miasto","Wieś","Rower","Hulajnoga","Las","Park","Chleb","Bułka",
+      "Mleko","Jogurt","Ser","Masło","Pudełko","Torba","Nożyczki","Długopis",
+      "Książka","Gazeta","Telewizor","Radio","Kawa","Herbata","Pączek","Drożdżówka",
+      "Internet","Telewizja","Szpital","Apteka","Kucharz","Kelner","Policjant","Strażak",
+      "Młotek","Śrubokręt","Farba","Pędzel","Gitara","Pianino","Skrzypce","Perkusja",
+      "Ziemia","Mars","Jabłko","Gruszka","Rakieta","Satelita","Most","Tunel",
+      "Szafa","Biurko","Lampa","Dywan","Samuraj","Rycerz","Smok","Elf",
+      "Świeca","Latarka","Traktor","Kombajn","Koparka","Buldożer","Robot","Dron",
+      "Telegram","List","Email","SMS","Król","Królowa","Książę","Księżniczka",
+      "Mapa","Kompas","GPS","Radar","Fotograf","Malarz","Pisarz","Poeta",
+      "Pralka","Lodówka","Zmywarka","Piekarnik","Doktor","Dentysta","Nauczyciel","Uczeń",
+      "Mostek","Port","Lotnisko","Dworzec","Klucz","Zamek","Moneta","Banknot",
+      "Futbol","Koszykówka","Siatkówka","Tenis","Basen","Rzeka","Źródło","Wodospad",
+      "Motyl","Pszczoła","Mrówka","Komar","Kaktus","Róża","Drzewo","Klon",
+      "Tęcza","Gwiazda","Planeta","Galaktyka","Film","Serial","Teatr","Opera",
+      "Komiks","Manga","Anime","Bajka","Statek kosmiczny","Łódź podwodna","Żaglówka","Kajak",
+      "Maska","Kapelusz","Płaszcz","Kurtka","Słoń","Żyrafa","Hipopotam","Krokodyl",
+      "Arbuz","Melon","Cytryna","Pomarańcza","Granat","Mango","Ananas","Kokos",
+      "Mięso","Kurczak","Wołowina","Wieprzowina","Szpinak","Marchew","Ogórek","Pomidor",
+      "Sekunda","Minuta","Godzina","Dzień","Tydzień","Miesiąc","Rok","Wiek",
+      "Kolor","Kształt","Dźwięk","Zapach","Chmura","Mgła","Burza","Huragan",
+      "Papuga","Kanarek","Kruk","Sowa","Pociąg towarowy","Metro","Tramwaj","Taxi",
+      "Biblioteka","Muzeum","Galeria","Teatr","Hotel","Restauracja","Kawiarnia","Bar"
+    ];
+
+    var players = []; // ["IMPOSTOR" lub słowo] x4
     var turn = 0;
 
+    function $(id){ return document.getElementById(id); }
+
     function startGame(){
-      players=[]; turn=0;
-      var idx = Math.floor(Math.random() * WORDS.length);
+      players = [];
+      turn = 0;
+      var idx = Math.floor(Math.random()*WORDS.length);
       var word = WORDS[idx];
-      var impostor = Math.floor(Math.random() * 4);
-      for (var i=0; i<4; i++){
-        if (i === impostor) players.push("IMPOSTOR");
-        else players.push(word);
-      }
-      document.getElementById("status").innerHTML = "Gracz 1/4 - kliknij Pokaż moje hasło";
-      document.getElementById("btnStart").style.display = "none";
-      document.getElementById("btnShow").style.display = "inline-block";
-      document.getElementById("btnHide").style.display = "none";
-      document.getElementById("wordBox").style.display = "none";
+      var impostor = Math.floor(Math.random()*4);
+      for (var i=0;i<4;i++){ players.push(i===impostor ? "IMPOSTOR" : word); }
+
+      $("status").innerHTML = "Gracz 1/4 — kliknij „Pokaż moje hasło”";
+      $("btnStart").style.display = "none";
+      $("btnShow").style.display  = "inline-block";
+      $("btnHide").style.display  = "none";
+      $("wordBox").style.display  = "none";
     }
 
     function showWord(){
-      if(turn >= 4) return;
-      document.getElementById("wordBox").innerHTML = players[turn];
-      document.getElementById("wordBox").style.display = "block";
-      document.getElementById("btnShow").style.display = "none";
-      document.getElementById("btnHide").style.display = "inline-block";
+      if (turn>=4) return;
+      $("wordBox").innerHTML = players[turn];
+      $("wordBox").style.display = "block";
+      $("btnShow").style.display  = "none";
+      $("btnHide").style.display  = "inline-block";
     }
 
     function hideWord(){
-      document.getElementById("wordBox").style.display = "none";
+      $("wordBox").style.display = "none";
       turn++;
-      if (turn >= 4){
-        document.getElementById("status").innerHTML = "Runda zakończona! Kliknij Nowa runda.";
-        document.getElementById("btnStart").style.display = "inline-block";
-        document.getElementById("btnShow").style.display = "none";
-        document.getElementById("btnHide").style.display = "none";
+      if (turn>=4){
+        $("status").innerHTML = "Runda zakończona — kliknij „Nowa runda”.";
+        $("btnStart").style.display = "inline-block";
+        $("btnShow").style.display  = "none";
+        $("btnHide").style.display  = "none";
       } else {
-        document.getElementById("status").innerHTML = "Gracz " + (turn+1) + "/4 - kliknij Pokaż moje hasło";
-        document.getElementById("btnShow").style.display = "inline-block";
-        document.getElementById("btnHide").style.display = "none";
+        $("status").innerHTML = "Gracz "+(turn+1)+"/4 — kliknij „Pokaż moje hasło”.";
+        $("btnShow").style.display  = "inline-block";
+        $("btnHide").style.display  = "none";
       }
     }
-
-    document.getElementById("btnStart").onclick = startGame;
-    document.getElementById("btnShow").onclick = showWord;
-    document.getElementById("btnHide").onclick = hideWord;
   </script>
 </body>
 </html>
