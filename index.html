@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Gra Impostor</title>
+  <title>Gra Impostor — 3 osoby</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { margin:0; padding:0; background:#0f1115; color:#fff; font-family:sans-serif; text-align:center; }
@@ -16,17 +16,17 @@
   </style>
 </head>
 <body>
-  <h1>🎭 Gra Impostor 🎭</h1>
+  <h1>🎭 Gra Impostor — 3 osoby 🎭</h1>
   <div id="status">Kliknij „Nowa runda”, aby zacząć</div>
   <div id="wordBox"></div>
 
-  <!-- Uwaga: proste onclick — żadnych addEventListener -->
+  <!-- proste onclick dla pełnej zgodności z Safari -->
   <button id="btnStart" class="info"  onclick="startGame()">Nowa runda</button>
   <button id="btnShow"  class="ok"     style="display:none" onclick="showWord()">Pokaż moje hasło</button>
   <button id="btnHide"  class="danger" style="display:none" onclick="hideWord()">Ukryj</button>
 
   <script>
-    // 200 słów (100 par — losujemy po prostu jedno słowo dla większości)
+    // 200 słów (duża pula)
     var WORDS = [
       "Pizza","Hamburger","Pies","Kot","Morze","Jezioro","Plaża","Góry",
       "Telefon","Komputer","Truskawka","Wiśnia","Autobus","Pociąg","Samochód","Motocykl",
@@ -60,7 +60,8 @@
       "Biblioteka","Muzeum","Galeria","Teatr","Hotel","Restauracja","Kawiarnia","Bar"
     ];
 
-    var players = []; // ["IMPOSTOR" lub słowo] x4
+    var TOTAL = 3;     // liczba graczy
+    var players = [];  // ["IMPOSTOR" lub słowo] x3
     var turn = 0;
 
     function $(id){ return document.getElementById(id); }
@@ -68,12 +69,12 @@
     function startGame(){
       players = [];
       turn = 0;
-      var idx = Math.floor(Math.random()*WORDS.length);
-      var word = WORDS[idx];
-      var impostor = Math.floor(Math.random()*4);
-      for (var i=0;i<4;i++){ players.push(i===impostor ? "IMPOSTOR" : word); }
-
-      $("status").innerHTML = "Gracz 1/4 — kliknij „Pokaż moje hasło”";
+      var word = WORDS[Math.floor(Math.random()*WORDS.length)];
+      var impostor = Math.floor(Math.random()*TOTAL); // 0..2
+      for (var i=0;i<TOTAL;i++){
+        players.push(i===impostor ? "IMPOSTOR" : word);
+      }
+      $("status").innerHTML = "Gracz 1/3 — kliknij „Pokaż moje hasło”.";
       $("btnStart").style.display = "none";
       $("btnShow").style.display  = "inline-block";
       $("btnHide").style.display  = "none";
@@ -81,7 +82,7 @@
     }
 
     function showWord(){
-      if (turn>=4) return;
+      if (turn>=TOTAL) return;
       $("wordBox").innerHTML = players[turn];
       $("wordBox").style.display = "block";
       $("btnShow").style.display  = "none";
@@ -91,13 +92,13 @@
     function hideWord(){
       $("wordBox").style.display = "none";
       turn++;
-      if (turn>=4){
+      if (turn>=TOTAL){
         $("status").innerHTML = "Runda zakończona — kliknij „Nowa runda”.";
         $("btnStart").style.display = "inline-block";
         $("btnShow").style.display  = "none";
         $("btnHide").style.display  = "none";
       } else {
-        $("status").innerHTML = "Gracz "+(turn+1)+"/4 — kliknij „Pokaż moje hasło”.";
+        $("status").innerHTML = "Gracz "+(turn+1)+"/3 — kliknij „Pokaż moje hasło”.";
         $("btnShow").style.display  = "inline-block";
         $("btnHide").style.display  = "none";
       }
